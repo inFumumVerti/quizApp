@@ -10,3 +10,4 @@ public interface SpringDataQuizRepository extends JpaRepository<Quiz, UUID> {
 
     void deleteById(Long id);
 }
+ 

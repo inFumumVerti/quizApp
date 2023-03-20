@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "maven-compiler-plugin": "^0.0.1-security"
+  }
+}
