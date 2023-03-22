@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import jakarta.annotation.Nonnull;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -13,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "quiz")
@@ -69,11 +70,11 @@ public class Quiz {
         return questions;
     }
 
-    public void addQuestion(@Nonnull final Question question) {
+    public void addQuestion(@NotNull final Question question) {
         this.questions.add(question);
     }
 
-    public void removeQuestion(@Nonnull final Question question) {
+    public void removeQuestion(@NotNull final Question question) {
         this.questions.remove(question);
     }
 }
