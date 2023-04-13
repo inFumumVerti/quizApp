@@ -25,30 +25,24 @@ public class Question {
     @Column(name = "description")
     private String description;
 
-    @NotNull
-    @Column(name = "question_type")
-    private QuestionType questionType;
-
     @NotBlank
     @Column(name = "correct_answer")
     private String correctAnswer;
 
     @NotBlank
     @Column(name = "answer_options")
-    private String[] answerOptions;
+    private String answerOptions;
 
     protected Question() {
         // default constructor for JPA
     }
 
     public Question(@NotBlank final String title, @NotBlank final String description,
-                    @NotNull final QuestionType questionType, @NotBlank final String correctAnswer,
+                    @NotBlank final String correctAnswer,
                     @NotBlank final String[] answerOptions) {
         this.title = title;
-        this.description = description;
-        this.questionType = questionType;
         this.correctAnswer = correctAnswer;
-        this.answerOptions = answerOptions;
+        this.answerOptions = String.join(",", answerOptions);
     }
 
     public Long getId() {
@@ -63,22 +57,6 @@ public class Question {
         this.title = title;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(final String description) {
-        this.description = description;
-    }
-
-    public QuestionType getQuestionType() {
-        return questionType;
-    }
-
-    public void setQuestionType(final QuestionType questionType) {
-        this.questionType = questionType;
-    }
-
     public String getCorrectAnswer() {
         return correctAnswer;
     }
@@ -88,11 +66,11 @@ public class Question {
     }
 
     public String[] getAnswerOptions() {
-        return answerOptions;
+        return answerOptions.split(",");
     }
 
     public void setAnswerOptions(final String[] answerOptions) {
-        this.answerOptions = answerOptions;
+        this.answerOptions = String.join(",", answerOptions);
     }
 
     public boolean checkAnswer(final String givenAnswer) {

@@ -12,7 +12,7 @@ public class QuestionMapper implements Function<Question, QuestionResource> {
     }
 
     private QuestionResource map(final Question question){
-        return new QuestionResource(question.getId(), question.getTitle(), question.getDescription(), question.getQuestionType(), question.getCorrectAnswer(), question.getAnswerOptions());
+        return new QuestionResource(question.getId(), question.getTitle(), question.getCorrectAnswer(), question.getAnswerOptions());
     }
 
 }
