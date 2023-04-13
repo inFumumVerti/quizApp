@@ -5,6 +5,9 @@ import de.dhbw.quizapp.domain.question.Question;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.stereotype.Repository;
+
+@Repository
 public interface QuestionRepository {
     Question save(Question question);
 
