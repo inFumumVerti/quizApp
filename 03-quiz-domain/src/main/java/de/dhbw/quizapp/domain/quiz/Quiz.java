@@ -13,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
 @Entity
@@ -33,17 +34,11 @@ public class Quiz {
     private String description;
 
     @ManyToMany
+    @NotEmpty
     private List<Question> questions;
 
     protected Quiz() {
         // default constructor for JPA
-    }
-
-    public Quiz(@NotBlank final String title, @NotBlank final String description) {
-        this.id = UUID.randomUUID();
-        this.title = title;
-        this.description = description;
-        this.questions = new ArrayList<>();
     }
 
     public UUID getId() {

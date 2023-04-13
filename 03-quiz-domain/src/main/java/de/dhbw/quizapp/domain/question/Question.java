@@ -22,10 +22,6 @@ public class Question {
     private String title;
 
     @NotBlank
-    @Column(name = "description")
-    private String description;
-
-    @NotBlank
     @Column(name = "correct_answer")
     private String correctAnswer;
 
@@ -37,7 +33,7 @@ public class Question {
         // default constructor for JPA
     }
 
-    public Question(@NotBlank final String title, @NotBlank final String description,
+    public Question(@NotBlank final String title,
                     @NotBlank final String correctAnswer,
                     @NotBlank final String[] answerOptions) {
         this.title = title;

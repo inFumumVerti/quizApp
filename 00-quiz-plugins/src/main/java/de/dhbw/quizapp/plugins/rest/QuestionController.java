@@ -14,8 +14,8 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "/api/question")
+@CrossOrigin(origins = "http://localhost:3000")
 public class QuestionController {
-
     private final QuestionService questionService;
 
     @Autowired

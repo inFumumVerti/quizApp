@@ -5,15 +5,10 @@ import de.dhbw.quizapp.domain.question.Question;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface QuestionRepository {
-    Question save(Question question);
-
-    Optional<Question> findById(Long id);
-
-    List<Question> findAll();
-
-    void deleteById(Long id);
+public interface QuestionRepository extends JpaRepository<Question, Long> {
+    // No need to declare the methods, JpaRepository provides them
 }
