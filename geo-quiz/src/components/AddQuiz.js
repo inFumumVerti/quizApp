@@ -3,6 +3,9 @@ import axios from 'axios';
 import './AddQuiz.css'
 
 const AddQuiz = () => {
+  const [quizTitle, setQuizTitle] = useState("");
+  const [quizDescription, setQuizDescription] = useState("");
+  const [questions] = useState([]);
   const [quiz, setQuiz] = useState({
     title: '',
     description: '',
@@ -17,8 +20,6 @@ const AddQuiz = () => {
         ...quiz.questions,
         {
           title: '',
-          description: '',
-          questionType: '',
           correctAnswer: '',
           answerOptions: ['', '', '', ''],
         },
@@ -50,12 +51,23 @@ const AddQuiz = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:8080/api/quiz', quiz);
-      setQuiz({
-        title: '',
-        description: '',
-        questions: [],
-      });
+        // Save questions first
+        const savedQuestions = await Promise.all(
+            questions.map(async (question) => {
+              const response = await axios.post(
+                  "http://localhost:8080/api/question",
+                  question
+              );
+              return response.data;
+            })
+        );
+
+        // Save the quiz with the saved questions
+        const response = await axios.post("http://localhost:8080/api/quiz", {
+          title: quizTitle,
+          description: quizDescription,
+          questions: savedQuestions,
+        });
       setLoading(false);
       alert(`Quiz "${response.data.title}" added successfully!`);
     } catch (error) {
@@ -65,7 +77,7 @@ const AddQuiz = () => {
   };
 
   return (
-      <div>
+      <div className="add-quiz">
         <h2>Add a New Quiz</h2>
         <form onSubmit={handleSubmit}>
           <div>
@@ -73,17 +85,18 @@ const AddQuiz = () => {
             <input
                 type="text"
                 id="quizTitle"
-                value={quiz.title}
-                onChange={(e) => setQuiz({ ...quiz, title: e.target.value })}
+                value={quizTitle}
+                onChange={(e) => setQuizTitle(e.target.value)}
                 required
             />
           </div>
           <div>
             <label htmlFor="quizDescription">Quiz Description: </label>
-            <textarea
+            <input
+                type="text"
                 id="quizDescription"
-                value={quiz.description}
-                onChange={(e) => setQuiz({ ...quiz, description: e.target.value })}
+                value={quizDescription}
+                onChange={(e) => setQuizDescription(e.target.value)}
                 required
             />
           </div>
@@ -103,46 +116,27 @@ const AddQuiz = () => {
                   />
                 </div>
                 <div>
-                  <label htmlFor={`questionDescription-${questionIndex}`}>Description: </label>
-                  <textarea
-                      id={`questionDescription-${questionIndex}`}
-                      value={question.description}
-                      onChange={(e) =>
-                          handleQuestionChange(questionIndex, 'description', e.target.value)
-                      }
-                      required
-                  />
-                </div>
-                <div>
-                  <label htmlFor={`questionType-${questionIndex}`}>Type: </label>
-                  <select
-                      id={`questionType-${questionIndex}`}
-                      value={question.questionType}
-                      onChange={(e) =>
-                          handleQuestionChange(questionIndex, 'questionType', e.target.value)
-                      }
-                      required
-                  >
-                    <option value="">Select Question Type</option>
-                    {/* Add more options for question types based on your backend */}
-                  </select>
-                </div>
-                <div>
                   <label htmlFor={`correctAnswer-${questionIndex}`}>Correct Answer: </label>
-                  <input
-                      type="text"
+                  <select
                       id={`correctAnswer-${questionIndex}`}
                       value={question.correctAnswer}
                       onChange={(e) =>
                           handleQuestionChange(questionIndex, 'correctAnswer', e.target.value)
                       }
                       required
-                  />
+                  >
+                    <option value="">Select Correct Answer</option>
+                    {question.answerOptions.map((_, answerIndex) => (
+                        <option value={String.fromCharCode(65 + answerIndex)} key={answerIndex}>
+                          {String.fromCharCode(65 + answerIndex)}
+                        </option>
+                    ))}
+                  </select>
                 </div>
                 {question.answerOptions.map((answer, answerIndex) => (
                     <div key={answerIndex}>
                       <label htmlFor={`answerOption-${questionIndex}-${answerIndex}`}>
-                        Answer {answerIndex + 1}:
+                        Answer {String.fromCharCode(65 + answerIndex)}:
                       </label>
                       <input
                           type="text"
