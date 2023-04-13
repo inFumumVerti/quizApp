@@ -5,7 +5,6 @@ import './AddQuiz.css'
 const AddQuiz = () => {
   const [quizTitle, setQuizTitle] = useState("");
   const [quizDescription, setQuizDescription] = useState("");
-  const [questions] = useState([]);
   const [quiz, setQuiz] = useState({
     title: '',
     description: '',
@@ -53,7 +52,7 @@ const AddQuiz = () => {
     try {
         // Save questions first
         const savedQuestions = await Promise.all(
-            questions.map(async (question) => {
+            quiz.questions.map(async (question) => {
               const response = await axios.post(
                   "http://localhost:8080/api/question",
                   question
@@ -71,6 +70,7 @@ const AddQuiz = () => {
       setLoading(false);
       alert(`Quiz "${response.data.title}" added successfully!`);
     } catch (error) {
+      alert(error)
       setLoading(false);
       alert('Error adding quiz. Please try again.');
     }
@@ -155,7 +155,7 @@ const AddQuiz = () => {
               </div>
           ))}
           <button type="button" onClick={addQuestion}>Add Question</button>
-          <button type="submit" disabled={loading}>
+          <button type="submit" disabled={loading || quiz.questions.length === 0}>
             {loading ? 'Adding...' : 'Add Quiz'}
           </button>
         </form>
