@@ -41,6 +41,7 @@ nav {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  overflow: auto;
 }
 
 .bottom-bar {
@@ -48,4 +49,10 @@ nav {
   text-align: center;
   padding: 10px;
   height: 50px;
+}
+
+body {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100%;
 }
