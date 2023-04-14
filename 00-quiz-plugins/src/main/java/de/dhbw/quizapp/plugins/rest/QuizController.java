@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping(value = "/api/quiz")
@@ -31,8 +32,8 @@ public class QuizController {
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public Quiz getQuiz(@PathVariable("id") Long id) {
-        return quizService.findQuizById(id).orElse(null);
+    public Quiz getQuiz(@PathVariable("id") UUID id) {
+        return quizService.findQuizById(id);
     }
 
     @RequestMapping(method = RequestMethod.GET)
@@ -41,7 +42,7 @@ public class QuizController {
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    public void deleteQuiz(@PathVariable("id") Long id) {
+    public void deleteQuiz(@PathVariable("id") UUID id) {
         quizService.deleteQuizById(id);
     }
 }
