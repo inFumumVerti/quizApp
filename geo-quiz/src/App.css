@@ -41,8 +41,10 @@ nav {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
   overflow: auto;
 }
+
 
 .bottom-bar {
   background-color: #ccc;

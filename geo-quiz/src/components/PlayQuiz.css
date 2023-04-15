@@ -55,8 +55,11 @@ button:disabled {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 10px;
-    width: 100%;
+    min-width: 280px; /* Add this line */
+    max-width: 280px; /* Update this line */
+    margin: 0 auto; /* Add this line */
 }
+
 
 .answer-cell {
     padding: 1rem;
