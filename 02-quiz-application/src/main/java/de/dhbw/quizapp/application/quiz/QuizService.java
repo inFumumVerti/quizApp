@@ -25,6 +25,10 @@ public class QuizService {
         return quizRepository.findById(id).orElseThrow(() -> new QuizNotFoundException("Quiz not found with ID: " + id));
     }
 
+    public List<Quiz> findQuizzesByName(String name) {
+        return quizRepository.findByTitle(name);
+    }
+
     public List<Quiz> findAllQuizzes() {
         return quizRepository.findAll();
     }
@@ -62,5 +66,6 @@ public class QuizService {
 
         return result;
     }
+
 
 }
