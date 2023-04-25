@@ -6,12 +6,15 @@ import de.dhbw.quizapp.application.quiz.QuizService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -26,23 +29,29 @@ public class QuizController {
         this.quizService = quizService;
     }
 
-    @RequestMapping(method = RequestMethod.POST)
+    @PostMapping
     public Quiz createQuiz(@RequestBody Quiz quiz) {
         return quizService.saveQuiz(quiz);
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    @GetMapping(value = "/{id}")
     public Quiz getQuiz(@PathVariable("id") UUID id) {
         return quizService.findQuizById(id);
     }
 
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping
     public List<Quiz> getAllQuizzes() {
         return quizService.findAllQuizzes();
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/{id}")
     public void deleteQuiz(@PathVariable("id") UUID id) {
         quizService.deleteQuizById(id);
     }
+
+    @PostMapping(value = "/{id}/submit")
+    public Map<String, Object> submitQuiz(@PathVariable("id") UUID id, @RequestBody List<String> userAnswers) {
+        return quizService.evaluateQuiz(id, userAnswers);
+    }
+
 }

@@ -1,16 +1,11 @@
 package de.dhbw.quizapp.plugins.rest;
 
-import de.dhbw.quizapp.domain.question.Question;
 import de.dhbw.quizapp.application.question.QuestionService;
-
+import de.dhbw.quizapp.domain.question.Question;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "/api/question")
@@ -23,22 +18,22 @@ public class QuestionController {
         this.questionService = questionService;
     }
 
-    @RequestMapping(method = RequestMethod.POST)
+    @PostMapping
     public Question createQuestion(@RequestBody Question question) {
         return questionService.saveQuestion(question);
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    @GetMapping(value = "/{id}")
     public Question getQuestion(@PathVariable Long id) {
         return questionService.findQuestionById(id).orElse(null);
     }
 
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping
     public List<Question> getAllQuestions() {
         return questionService.findAllQuestions();
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/{id}")
     public void deleteQuestion(@PathVariable Long id) {
         questionService.deleteQuestionById(id);
     }

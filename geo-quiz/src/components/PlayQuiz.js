@@ -29,20 +29,27 @@ const PlayQuiz = () => {
         setUserAnswers({ ...userAnswers, answers: newUserAnswers });
     };
 
-    const handleSubmit = () => {
-        if (userAnswers.currentIndex === quiz.questions.length - 1) {
-            setShowResults(true);
-        } else {
-            setUserAnswers({ ...userAnswers, currentIndex: userAnswers.currentIndex + 1 });
-        }
-    };
+    const handleSubmit = async () => {
+            if (userAnswers.currentIndex === quiz.questions.length - 1) {
+                try {
+                    const response = await axios.post(`${QUIZ_API_BASE_URL}/${id}/submit`, userAnswers.answers);
+                    handleQuizResponse(response.data);
+                } catch (error) {
+                    console.error('Error submitting quiz:', error);
+                }
+            } else {
+                setUserAnswers({ ...userAnswers, currentIndex: userAnswers.currentIndex + 1 });
+            }
+        };
 
-    const calculateScore = () => {
-        return userAnswers.answers.reduce(
-            (score, answer, index) => (quiz.questions[index].correctAnswer === answer ? score + 1 : score),
-            0
-        );
-    };
+        const handleQuizResponse = (quizResponse) => {
+            setShowResults(true);
+            setUserAnswers((prevState) => ({
+                ...prevState,
+                results: quizResponse.questionResults,
+                score: quizResponse.score,
+            }));
+        };
 
     if (!quiz) {
         return <div>Loading...</div>;
@@ -53,7 +60,7 @@ const PlayQuiz = () => {
             <div className="quiz-results">
                 <h1>Results</h1>
                 <p>
-                    You scored {calculateScore()} out of {quiz.questions.length}
+                    You scored {userAnswers.score} out of {quiz.questions.length}
                 </p>
                 <Link to="/quizList">Back to quiz list</Link>
                 <div className="result-question-container">
