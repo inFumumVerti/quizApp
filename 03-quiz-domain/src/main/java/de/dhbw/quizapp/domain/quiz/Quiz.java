@@ -37,7 +37,7 @@ public class Quiz {
     @NotEmpty
     private List<Question> questions;
 
-    protected Quiz() {
+    public Quiz() {
         // default constructor for JPA
     }
 
