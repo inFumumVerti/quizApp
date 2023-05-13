@@ -28,6 +28,39 @@ const QuizList = () => {
         fetchQuizzes(searchTerm);
     };
 
+    const deleteQuiz = async (id, title) => {
+        if(window.confirm(`Are you sure you want to delete Quiz '${title}'?`)) {
+            try {
+                await axios.delete(`${QUIZ_API_BASE_URL}/${id}`);
+                // After deletion, fetch the updated list of quizzes
+                fetchQuizzes();
+            } catch (error) {
+                console.error('Error deleting quiz:', error);
+            }
+        }
+    };
+
+
+    const exportQuiz = (quiz) => {
+        let quizCopy = {...quiz};
+        // Remove the id property
+        delete quizCopy.id;
+        // Remove the id from each question
+        quizCopy.questions = quizCopy.questions.map(question => {
+            let questionCopy = {...question};
+            delete questionCopy.id;
+            return questionCopy;
+        });
+        const element = document.createElement("a");
+        const file = new Blob([JSON.stringify(quizCopy)], {type: 'application/json'});
+        element.href = URL.createObjectURL(file);
+        element.download = `${quiz.title}.json`;
+        document.body.appendChild(element); // Required for this to work in FireFox
+        element.click();
+    };
+
+
+
     return (
         <div className="quiz-list">
             <h2>Available Quizzes</h2>
@@ -41,7 +74,7 @@ const QuizList = () => {
             </form>
             <ul>
                 {quizzes.map((quiz) => (
-                    <li key={quiz.id}>
+                    <li key={quiz.id} style={{ position: 'relative' }}>
                         <Link to={`/quiz/${quiz.id}`}>
                             <h3>{quiz.title}</h3>
                         </Link>
@@ -49,8 +82,12 @@ const QuizList = () => {
                         <p>
                             <strong>Number of questions:</strong> {quiz.questions.length}
                         </p>
+                        <button className="delete-button" onClick={() => deleteQuiz(quiz.id, quiz.title)}>X</button>
+                        <button className="export-button" onClick={() => exportQuiz(quiz)}>Export</button>
                     </li>
                 ))}
+
+
             </ul>
         </div>
     );
