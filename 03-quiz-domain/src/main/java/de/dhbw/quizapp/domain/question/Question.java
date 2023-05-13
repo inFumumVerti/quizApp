@@ -29,7 +29,7 @@ public class Question {
     @Column(name = "answer_options")
     private String answerOptions;
 
-    protected Question() {
+    public Question() {
         // default constructor for JPA
     }
 

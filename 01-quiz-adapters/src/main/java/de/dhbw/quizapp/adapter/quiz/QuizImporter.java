@@ -30,7 +30,12 @@ public class QuizImporter {
         quiz.setTitle(title);
         quiz.setDescription(description);
 
-        for (JsonNode questionNode : quizNode.get("questions")) {
+        JsonNode questionsNode = quizNode.get("questions");
+        if (questionsNode == null) {
+            throw new IllegalArgumentException("Quiz JSON must include 'questions' field.");
+        }
+
+        for (JsonNode questionNode : questionsNode) {
             String questionTitle = questionNode.get("title").asText();
             String correctAnswer = questionNode.get("correctAnswer").asText();
             List<String> answerOptions = objectMapper.convertValue(questionNode.get("answerOptions"), new TypeReference<List<String>>(){});
@@ -44,8 +49,8 @@ public class QuizImporter {
             quiz.addQuestion(question);
         }
 
-
         return quiz;
     }
+
 
 }
