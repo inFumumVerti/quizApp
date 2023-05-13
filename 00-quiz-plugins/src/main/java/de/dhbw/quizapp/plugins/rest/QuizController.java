@@ -1,11 +1,13 @@
 package de.dhbw.quizapp.plugins.rest;
 
+import de.dhbw.quizapp.adapter.quiz.QuizImporter;
 import de.dhbw.quizapp.domain.quiz.Quiz;
 import de.dhbw.quizapp.application.quiz.QuizService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -16,16 +18,24 @@ import java.util.UUID;
 public class QuizController {
 
     private final QuizService quizService;
+    private final QuizImporter quizImporter;
 
     @Autowired
-    public QuizController(QuizService quizService) {
+    public QuizController(QuizService quizService, QuizImporter quizImporter) {
         this.quizService = quizService;
+        this.quizImporter = quizImporter;
     }
 
     @PostMapping
-    public Quiz createQuiz(@RequestBody Quiz quiz) {
-        return quizService.saveQuiz(quiz);
+    public Quiz createQuiz(@RequestBody String quizJson) {
+        try {
+            Quiz quiz = quizImporter.createQuizFromJson(quizJson);
+            return quizService.saveQuiz(quiz);
+        } catch (IOException e) {
+            throw new RuntimeException("Error creating quiz: " + e.getMessage(), e);
+        }
     }
+
 
     @GetMapping(value = "/{id}")
     public Quiz getQuiz(@PathVariable("id") UUID id) {
@@ -51,5 +61,6 @@ public class QuizController {
     public Map<String, Object> submitQuiz(@PathVariable("id") UUID id, @RequestBody List<String> userAnswers) {
         return quizService.evaluateQuiz(id, userAnswers);
     }
+
 
 }

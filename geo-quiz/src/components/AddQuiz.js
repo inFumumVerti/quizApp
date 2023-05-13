@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './AddQuiz.css'
+import Modal from 'react-modal';
 
 const AddQuiz = () => {
   const [quizTitle, setQuizTitle] = useState("");
@@ -14,6 +15,8 @@ const AddQuiz = () => {
   const [loading, setLoading] = useState(false);
   const [quizAdded, setQuizAdded] = useState(false);
   const [addedQuizId, setAddedQuizId] = useState(null);
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [importQuizJson, setImportQuizJson] = useState('');
   const navigate = useNavigate();
 
   const addQuestion = () => {
@@ -36,6 +39,16 @@ const AddQuiz = () => {
       questions: quiz.questions.filter((_, index) => index !== questionIndex),
     });
   };
+
+const handleImportQuiz = async () => {
+   try {
+     await axios.post('http://localhost:8080/api/quiz/import', importQuizJson);
+     setModalIsOpen(false);
+     setImportQuizJson('');
+   } catch (error) {
+     alert('Error importing quiz. Please try again.');
+   }
+ };
 
   const handleQuestionChange = (questionIndex, field, value) => {
     const updatedQuestions = [...quiz.questions];
@@ -68,39 +81,40 @@ const AddQuiz = () => {
     navigate('/');
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+    const handleQuizSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
 
-    try {
-      // Save questions first
-      const savedQuestions = await Promise.all(
-          quiz.questions.map(async (question) => {
-            const response = await axios.post(
-                "http://localhost:8080/api/question",
-                question
-            );
-            return response.data;
-          })
-      );
+        try {
+            let quizJson;
 
-      // Save the quiz with the saved questions
-      const response = await axios.post("http://localhost:8080/api/quiz", {
-        title: quizTitle,
-        description: quizDescription,
-        questions: savedQuestions,
-      });
-      setLoading(false);
-      setQuizAdded(true);
-      setAddedQuizId(response.data.id);
-    } catch (error) {
-      alert(error)
-      setLoading(false);
-      alert('Error adding quiz. Please try again.');
-    }
-  };
+            // Check if importQuizJson is not empty
+            if (importQuizJson !== '') {
+                quizJson = importQuizJson;
+            } else {
+                quizJson = JSON.stringify({
+                    title: quizTitle,
+                    description: quizDescription,
+                    questions: quiz.questions,
+                });
+            }
 
-  if (quizAdded) {
+            // Save the quiz
+            const response = await axios.post("http://localhost:8080/api/quiz", quizJson);
+            setLoading(false);
+            setQuizAdded(true);
+            setAddedQuizId(response.data.id);
+            setModalIsOpen(false);
+            setImportQuizJson('');
+        } catch (error) {
+            alert('Error adding quiz. Please try again.');
+            setLoading(false);
+        }
+    };
+
+
+
+    if (quizAdded) {
     return (
         <div className="quiz-added">
           <h2>Quiz added successfully!</h2>
@@ -112,8 +126,10 @@ const AddQuiz = () => {
   } else {
     return (
         <div className="add-quiz">
+         <button className="import-quiz-button" onClick={() => setModalIsOpen(true)}>Import Quiz</button>
+
           <h2>Add a New Quiz</h2>
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleQuizSubmit}>
             <div>
               <label htmlFor="quizTitle">Quiz Title: </label>
               <input
@@ -193,6 +209,21 @@ const AddQuiz = () => {
               {loading ? 'Adding...' : 'Add Quiz'}
             </button>
           </form>
+          <Modal
+          isOpen={modalIsOpen}
+          onRequestClose={() => setModalIsOpen(false)}
+          contentLabel="Import Quiz"
+          className="import-quiz-modal"
+        >
+          <h2>Import Quiz</h2>
+          <textarea
+            className="import-quiz-textarea"
+            value={importQuizJson}
+            onChange={(e) => setImportQuizJson(e.target.value)}
+          />
+          <button onClick={handleQuizSubmit}>Submit</button>
+          <button onClick={() => setModalIsOpen(false)}>Cancel</button>
+        </Modal>
         </div>
     );
   }

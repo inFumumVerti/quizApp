@@ -2,29 +2,26 @@ package de.dhbw.quizapp.adapter.quiz;
 
 import de.dhbw.quizapp.domain.quiz.Quiz;
 import de.dhbw.quizapp.domain.question.Question;
-import de.dhbw.quizapp.application.quiz.QuizService;
 import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Component
 public class QuizImporter {
-
-    private final QuizService quizService;
     private final ObjectMapper objectMapper;
 
-    public QuizImporter(QuizService quizService, ObjectMapper objectMapper) {
-        this.quizService = quizService;
+    public QuizImporter(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
-    public void importQuiz(String quizJson) throws IOException {
-        JsonNode quizNode = objectMapper.readTree(quizJson);
+    public Quiz createQuizFromJson(String quizJson) throws IOException {
+        String decodedQuizJson = URLDecoder.decode(quizJson, StandardCharsets.UTF_8.toString());
+        JsonNode quizNode = objectMapper.readTree(decodedQuizJson);
 
         String title = quizNode.get("title").asText();
         String description = quizNode.get("description").asText();
@@ -38,10 +35,17 @@ public class QuizImporter {
             String correctAnswer = questionNode.get("correctAnswer").asText();
             List<String> answerOptions = objectMapper.convertValue(questionNode.get("answerOptions"), new TypeReference<List<String>>(){});
 
+            // Check if correctAnswer is one of A, B, C or D
+            if (!correctAnswer.equals("A") && !correctAnswer.equals("B") && !correctAnswer.equals("C") && !correctAnswer.equals("D")) {
+                throw new IllegalArgumentException("Correct answer must be either A, B, C, or D.");
+            }
+
             Question question = new Question(questionTitle, correctAnswer, answerOptions.toArray(new String[0]));
             quiz.addQuestion(question);
         }
 
-        quizService.saveQuiz(quiz);
+
+        return quiz;
     }
+
 }
