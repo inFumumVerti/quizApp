@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { FiTrash2, FiDownload } from 'react-icons/fi';
 import './QuizList.css';
 import axios from "axios";
 
@@ -82,8 +83,12 @@ const QuizList = () => {
                         <p>
                             <strong>Number of questions:</strong> {quiz.questions.length}
                         </p>
-                        <button className="delete-button" onClick={() => deleteQuiz(quiz.id, quiz.title)}>X</button>
-                        <button className="export-button" onClick={() => exportQuiz(quiz)}>Export</button>
+                        <button className="delete-button" onClick={() => deleteQuiz(quiz.id, quiz.title)}>
+                            <FiTrash2 />
+                        </button>
+                        <button className="export-button" onClick={() => exportQuiz(quiz)}>
+                            <FiDownload />
+                        </button>
                     </li>
                 ))}
 

@@ -35,13 +35,12 @@
 
 .quiz-list .delete-button {
   color: red;
-  right: 25px;
 }
 
 
 .quiz-list .export-button {
   color: green;
-  top: 42px;
+  top: 45px;
 }
 
 .quiz-list li:hover {
