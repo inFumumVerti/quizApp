@@ -9,16 +9,12 @@ public class QuestionResource {
     
     private final String[] answerOptions;
 
-
-
     public QuestionResource(final Long id, final String title, final String correctAnswer, final String[] answerOptions) {
         this.id = id;
         this.title = title;
         this.correctAnswer = correctAnswer;
         this.answerOptions = answerOptions;
     }
-
-
 
     public Long getId() {
         return this.id;
