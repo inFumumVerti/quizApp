@@ -32,8 +32,11 @@ public class Quiz {
     @NotEmpty
     private List<Question> questions = new ArrayList<>();
 
-    public Quiz() {
-        // default constructor for JPA
+    public Quiz() {}
+
+    public Quiz(final String title, final String description) {
+        this.title = title;
+        this.description = description;
     }
 
     public UUID getId() {
