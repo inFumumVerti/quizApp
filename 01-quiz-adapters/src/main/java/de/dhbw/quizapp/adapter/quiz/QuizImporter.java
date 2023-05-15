@@ -26,6 +26,10 @@ public class QuizImporter {
     }
 
     public Quiz createQuizFromJson(String quizJson) throws IOException {
+        if (quizJson == null || quizJson.trim().isEmpty()) {
+            throw new IllegalArgumentException("Quiz JSON must not be empty.");
+        }
+
         String decodedQuizJson = URLDecoder.decode(quizJson, StandardCharsets.UTF_8.toString());
         JsonNode quizNode = objectMapper.readTree(decodedQuizJson);
 
@@ -34,8 +38,8 @@ public class QuizImporter {
         Quiz quiz = new Quiz(title, description);
 
         JsonNode questionsNode = quizNode.get(QUESTIONS);
-        if (questionsNode == null) {
-            throw new IllegalArgumentException("Quiz JSON must include 'questions' field.");
+        if (questionsNode == null || !questionsNode.isArray() || !questionsNode.elements().hasNext()) {
+            throw new IllegalArgumentException("Quiz JSON must include non-empty 'questions' field.");
         }
 
         for (JsonNode questionNode : questionsNode) {
@@ -51,19 +55,26 @@ public class QuizImporter {
         String correctAnswer = getTextFromNode(questionNode, CORRECT_ANSWER);
         List<String> answerOptions = objectMapper.convertValue(questionNode.get(ANSWER_OPTIONS), new TypeReference<List<String>>(){});
 
+        // Check if correctAnswer is one of A, B, C or D
         if (!AnswerOption.isValid(correctAnswer)) {
             throw new IllegalArgumentException("Correct answer must be either A, B, C, or D.");
         }
+
         return new Question(questionTitle, correctAnswer, answerOptions.toArray(new String[0]));
     }
 
     private String getTextFromNode(JsonNode node, String field) {
-        return node.get(field).asText();
+        JsonNode jsonNode = node.get(field);
+        if (jsonNode == null || jsonNode.asText().trim().isEmpty()) {
+            throw new IllegalArgumentException(String.format("Field '%s' must not be empty.", field));
+        }
+        return jsonNode.asText();
     }
 }
 
 enum AnswerOption {
     A, B, C, D;
+
     public static boolean isValid(String value) {
         for (AnswerOption option : values()) {
             if (option.name().equals(value)) {
