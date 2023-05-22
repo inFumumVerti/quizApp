@@ -38,7 +38,7 @@ public class Question {
                     @NotBlank final String[] answerOptions) {
         this.title = title;
         this.correctAnswer = correctAnswer;
-        this.answerOptions = String.join(",", answerOptions);
+        this.answerOptions = String.join("|", answerOptions);
     }
 
     public Long getId() {
@@ -62,15 +62,14 @@ public class Question {
     }
 
     public String[] getAnswerOptions() {
-        return answerOptions.split(",");
+        return answerOptions.split("\\|");
     }
 
     public void setAnswerOptions(final String[] answerOptions) {
-        this.answerOptions = String.join(",", answerOptions);
+        this.answerOptions = String.join("|", answerOptions);
     }
 
     public boolean checkAnswer(final String givenAnswer) {
         return correctAnswer.equalsIgnoreCase(givenAnswer);
     }
-
 }
