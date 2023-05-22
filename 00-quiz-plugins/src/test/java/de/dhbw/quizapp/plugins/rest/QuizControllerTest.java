@@ -15,11 +15,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
-
+import java.util.*;
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -95,5 +92,33 @@ public class QuizControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].title").value(quiz.getTitle()))
                 .andExpect(jsonPath("$[0].description").value(quiz.getDescription()));
+    }
+
+    @Test
+    public void testGetQuizNotFound() throws Exception {
+        UUID quizId = UUID.randomUUID();
+        when(quizService.findQuizById(any(UUID.class))).thenReturn(null);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/quiz/" + quizId))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testSearchQuizzesByNameNotFound() throws Exception {
+        String name = "Non-existent Quiz(ABCDXXX123)";
+        when(quizService.findQuizzesByName(anyString())).thenReturn(Collections.emptyList());
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/quiz/search?name=" + name))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(0)));
+    }
+
+    @Test
+    public void testGetAllQuizzesEmpty() throws Exception {
+        when(quizService.findAllQuizzes()).thenReturn(Collections.emptyList());
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/quiz"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(0)));
     }
 }

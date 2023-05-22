@@ -5,6 +5,8 @@ import de.dhbw.quizapp.domain.quiz.Quiz;
 import de.dhbw.quizapp.application.quiz.QuizService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -38,8 +40,9 @@ public class QuizController {
 
 
     @GetMapping(value = "/{id}")
-    public Quiz getQuiz(@PathVariable("id") UUID id) {
-        return quizService.findQuizById(id);
+    public ResponseEntity<Quiz> getQuiz(@PathVariable("id") UUID id) {
+        Quiz quiz = quizService.findQuizById(id);
+        return quiz != null ? ResponseEntity.ok(quiz) : ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
     @GetMapping(value = "/search")
