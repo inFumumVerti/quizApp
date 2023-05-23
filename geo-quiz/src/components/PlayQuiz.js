@@ -29,6 +29,11 @@ const PlayQuiz = () => {
         setUserAnswers({ ...userAnswers, answers: newUserAnswers });
     };
 
+    const handleNavigation = (direction) => {
+        const newCurrentIndex = direction === 'prev' ? userAnswers.currentIndex - 1 : userAnswers.currentIndex + 1;
+        setUserAnswers({ ...userAnswers, currentIndex: newCurrentIndex });
+    };
+
     const handleSubmit = async () => {
             if (userAnswers.currentIndex === quiz.questions.length - 1) {
                 try {
@@ -117,6 +122,7 @@ const PlayQuiz = () => {
             <div className="play-quiz">
                 <h2>{quiz.title}</h2>
                 <p>{quiz.description}</p>
+                <div className="question-counter">{`${userAnswers.currentIndex + 1} / ${quiz.questions.length}`}</div>
                 <div key={question.id} className="question">
                     <h3>{question.title}</h3>
                     <div className="answer-grid">
@@ -147,12 +153,27 @@ const PlayQuiz = () => {
                         ))}
                     </div>
                 </div>
-                <button
-                    onClick={handleSubmit}
-                    disabled={userAnswers.answers[userAnswers.currentIndex] === null}
-                >
-                    {userAnswers.currentIndex === quiz.questions.length - 1 ? 'Submit' : 'Next'}
-                </button>
+                <div className="button-container">
+                    <button
+                        onClick={() => handleNavigation('prev')}
+                        disabled={userAnswers.currentIndex === 0}
+                    >
+                        Previous
+                    </button>
+                    {userAnswers.currentIndex < quiz.questions.length - 1 ? (
+                        <button onClick={() => handleNavigation('next')}>
+                            Next
+                        </button>
+                    ) : (
+                        <button
+                            onClick={handleSubmit}
+                            disabled={userAnswers.answers[userAnswers.currentIndex] === null}
+                        >
+                            Submit
+                        </button>
+                    )}
+                </div>
+
             </div>
         );
     }
