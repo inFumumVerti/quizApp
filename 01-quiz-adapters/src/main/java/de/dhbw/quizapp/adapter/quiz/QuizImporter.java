@@ -14,7 +14,6 @@ import java.util.List;
 @Component
 public class QuizImporter {
     private final ObjectMapper objectMapper;
-
     private static final String TITLE = "title";
     private static final String DESCRIPTION = "description";
     private static final String QUESTIONS = "questions";
@@ -30,7 +29,7 @@ public class QuizImporter {
             throw new IllegalArgumentException("Quiz JSON must not be empty.");
         }
 
-        String decodedQuizJson = URLDecoder.decode(quizJson, StandardCharsets.UTF_8.toString());
+        String decodedQuizJson = URLDecoder.decode(quizJson, StandardCharsets.UTF_8);
         JsonNode quizNode = objectMapper.readTree(decodedQuizJson);
 
         String title = getTextFromNode(quizNode, TITLE);
@@ -53,9 +52,10 @@ public class QuizImporter {
     private Question createQuestionFromNode(JsonNode questionNode) {
         String questionTitle = getTextFromNode(questionNode, TITLE);
         String correctAnswer = getTextFromNode(questionNode, CORRECT_ANSWER);
-        List<String> answerOptions = objectMapper.convertValue(questionNode.get(ANSWER_OPTIONS), new TypeReference<List<String>>(){});
+        List<String> answerOptions = objectMapper.convertValue(questionNode.get(ANSWER_OPTIONS), new TypeReference<>() {
+        });
 
-        // Check if correctAnswer is one of A, B, C or D
+        // Check if correctAnswer is valid (A,B,C or D)
         if (!AnswerOption.isValid(correctAnswer)) {
             throw new IllegalArgumentException("Correct answer must be either A, B, C, or D.");
         }
