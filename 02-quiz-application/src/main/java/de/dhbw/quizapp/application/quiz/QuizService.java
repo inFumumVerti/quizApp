@@ -37,9 +37,8 @@ public class QuizService {
         quizRepository.deleteById(id);
     }
 
-    public Map<String, Object> evaluateQuiz(UUID id, List<String> userAnswers) {
+    public Map<String, Object> evaluateQuiz(UUID id, List<String> userAnswers, double elapsedTime) {
         Quiz quiz = findQuizById(id);
-
         int score = 0;
         List<Map<String, String>> questionResults = new ArrayList<>();
 
@@ -59,9 +58,12 @@ public class QuizService {
             questionResult.put("isCorrect", Boolean.toString(isCorrect));
             questionResults.add(questionResult);
         }
+        double pointsCorrect = ((double) score / quiz.getQuestions().size()) * 50;
+        double pointsTime = Math.max(0, Math.min(50, 50 * ((5 * quiz.getQuestions().size() - elapsedTime) / (5 * quiz.getQuestions().size()))));
+        int totalScore = (int) (pointsCorrect + pointsTime);
 
         Map<String, Object> result = new HashMap<>();
-        result.put("score", score);
+        result.put("score", totalScore);
         result.put("questionResults", questionResults);
 
         return result;

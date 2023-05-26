@@ -8,6 +8,7 @@ const PlayQuiz = () => {
     const [quiz, setQuiz] = useState(null);
     const [userAnswers, setUserAnswers] = useState({ currentIndex: 0, answers: [] });
     const [showResults, setShowResults] = useState(false);
+    const [startTime, setStartTime] = useState(null);
     const { id } = useParams();
     const QUIZ_API_BASE_URL = 'http://localhost:8080/api/quiz';
 
@@ -20,6 +21,7 @@ const PlayQuiz = () => {
             } catch (error) {
                 console.error('Error fetching quiz:', error);
             }
+            setStartTime(new Date().getTime());
         })();
     }, [id]);
 
@@ -36,6 +38,8 @@ const PlayQuiz = () => {
 
     const handleSubmit = async () => {
             if (userAnswers.currentIndex === quiz.questions.length - 1) {
+                const endTime = new Date().getTime();
+                const elapsedTime = (endTime - startTime) / 1000;
                 try {
                     const response = await axios.post(`${QUIZ_API_BASE_URL}/${id}/submit`, userAnswers.answers);
                     handleQuizResponse(response.data);
@@ -167,10 +171,11 @@ const PlayQuiz = () => {
                     ) : (
                         <button
                             onClick={handleSubmit}
-                            disabled={userAnswers.answers[userAnswers.currentIndex] === null}
+                            disabled={userAnswers.answers.some(answer => answer === null)}
                         >
                             Submit
                         </button>
+
                     )}
                 </div>
 
