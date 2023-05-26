@@ -5,11 +5,10 @@ import java.util.Objects;
 public class Score {
     private final int value;
 
-    public Score(int value) {
-        if (value < 0 || value > 100) {
-            throw new IllegalArgumentException("Score must be between 0 and 100.");
-        }
-        this.value = value;
+    public Score(int correctAnswers, int totalQuestions, int timeTaken, int totalTimeAllowed) {
+        double correctPoints = ((double) correctAnswers / totalQuestions) * 50;
+        double timePoints = ((double) correctAnswers / totalQuestions) *(Math.max(0, Math.min(50, 50 * ((totalTimeAllowed - timeTaken) / (double) totalTimeAllowed))));
+        this.value = (int) Math.floor(correctPoints + timePoints);
     }
 
     public int getValue() {

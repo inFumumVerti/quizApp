@@ -1,5 +1,6 @@
 package de.dhbw.quizapp.application.quiz;
 
+import de.dhbw.quizapp.domain.Score.Score;
 import de.dhbw.quizapp.domain.question.Question;
 import de.dhbw.quizapp.domain.quiz.Quiz;
 import de.dhbw.quizapp.domain.repository.quiz.QuizRepository;
@@ -37,18 +38,22 @@ public class QuizService {
         quizRepository.deleteById(id);
     }
 
-    public Map<String, Object> evaluateQuiz(UUID id, List<String> userAnswers, double elapsedTime) {
+    public Map<String, Object> evaluateQuiz(UUID id, List<String> userAnswers, int timeTaken) {
         Quiz quiz = findQuizById(id);
-        int score = 0;
+
+        int correctAnswers = 0;
+        int totalQuestions = quiz.getQuestions().size();
+        int totalTimeAllowed = totalQuestions * 5; // 5 seconds per question
+
         List<Map<String, String>> questionResults = new ArrayList<>();
 
-        for (int i = 0; i < quiz.getQuestions().size(); i++) {
+        for (int i = 0; i < totalQuestions; i++) {
             Question question = quiz.getQuestions().get(i);
             String userAnswer = userAnswers.get(i);
             boolean isCorrect = question.getCorrectAnswer().equals(userAnswer);
 
             if (isCorrect) {
-                score++;
+                correctAnswers++;
             }
 
             Map<String, String> questionResult = new HashMap<>();
@@ -58,16 +63,13 @@ public class QuizService {
             questionResult.put("isCorrect", Boolean.toString(isCorrect));
             questionResults.add(questionResult);
         }
-        double pointsCorrect = ((double) score / quiz.getQuestions().size()) * 50;
-        double pointsTime = Math.max(0, Math.min(50, 50 * ((5 * quiz.getQuestions().size() - elapsedTime) / (5 * quiz.getQuestions().size()))));
-        int totalScore = (int) (pointsCorrect + pointsTime);
+
+        Score score = new Score(correctAnswers, totalQuestions, timeTaken, totalTimeAllowed);
 
         Map<String, Object> result = new HashMap<>();
-        result.put("score", totalScore);
+        result.put("score", score.getValue());
         result.put("questionResults", questionResults);
 
         return result;
     }
-
-
 }
