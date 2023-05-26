@@ -1,4 +1,4 @@
-// PlayQuiz.js
+"// PlayQuiz.js
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
@@ -37,19 +37,26 @@ const PlayQuiz = () => {
     };
 
     const handleSubmit = async () => {
-            if (userAnswers.currentIndex === quiz.questions.length - 1) {
-                const endTime = new Date().getTime();
-                const elapsedTime = (endTime - startTime) / 1000;
-                try {
-                    const response = await axios.post(`${QUIZ_API_BASE_URL}/${id}/submit`, userAnswers.answers);
-                    handleQuizResponse(response.data);
-                } catch (error) {
-                    console.error('Error submitting quiz:', error);
-                }
-            } else {
-                setUserAnswers({ ...userAnswers, currentIndex: userAnswers.currentIndex + 1 });
+        if (userAnswers.currentIndex === quiz.questions.length - 1) {
+            const endTime = new Date().getTime();
+            const elapsedTime = Math.floor((endTime - startTime) / 1000);
+            try {
+                const response = await axios.post(
+                    `${QUIZ_API_BASE_URL}/${id}/submit`,
+                    {
+                        userAnswers: userAnswers.answers,
+                        elapsedTime: elapsedTime
+                    }
+                );
+                handleQuizResponse(response.data);
+            } catch (error) {
+                console.error('Error submitting quiz:', error);
             }
-        };
+        } else {
+            setUserAnswers({ ...userAnswers, currentIndex: userAnswers.currentIndex + 1 });
+        }
+    };
+
 
         const handleQuizResponse = (quizResponse) => {
             setShowResults(true);
@@ -59,7 +66,6 @@ const PlayQuiz = () => {
                 score: quizResponse.score,
             }));
         };
-
     if (!quiz) {
         return <div>Loading...</div>;
     }
@@ -69,9 +75,9 @@ const PlayQuiz = () => {
             <div className="quiz-results">
                 <h1>Results</h1>
                 <p>
-                    You scored {userAnswers.score} out of {quiz.questions.length}
+                    <h2>Your score is {userAnswers.score} out of 100!</h2>
                 </p>
-                <Link to="/quizList">Back to quiz list</Link>
+
                 <div className="result-question-container">
                     {quiz.questions.map((question, questionIndex) => {
                         const isUserCorrect = question.correctAnswer === userAnswers.answers[questionIndex];
@@ -185,5 +191,3 @@ const PlayQuiz = () => {
 };
 
 export default PlayQuiz;
-
-

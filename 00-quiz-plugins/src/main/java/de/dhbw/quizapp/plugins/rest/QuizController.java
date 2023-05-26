@@ -63,10 +63,7 @@ public class QuizController {
     @PostMapping(value = "/{id}/submit")
     public Map<String, Object> submitQuiz(@PathVariable("id") UUID id, @RequestBody Map<String, Object> body) {
         List<String> userAnswers = (List<String>) body.get("userAnswers");
-        double elapsedTime = (double) body.get("elapsedTime");
+        int elapsedTime = (int) body.get("elapsedTime");
         return quizService.evaluateQuiz(id, userAnswers, elapsedTime);
     }
-
-
-
 }
