@@ -1,6 +1,7 @@
 package de.dhbw.quizapp.plugins.rest;
 
 import de.dhbw.quizapp.adapter.quiz.QuizImporter;
+import de.dhbw.quizapp.application.openai.AIGenService;
 import de.dhbw.quizapp.domain.quiz.Quiz;
 import de.dhbw.quizapp.application.quiz.QuizService;
 
@@ -21,11 +22,13 @@ public class QuizController {
 
     private final QuizService quizService;
     private final QuizImporter quizImporter;
+    private final AIGenService AIGenService;
 
     @Autowired
-    public QuizController(QuizService quizService, QuizImporter quizImporter) {
+    public QuizController(QuizService quizService, QuizImporter quizImporter, AIGenService AIGenService) {
         this.quizService = quizService;
         this.quizImporter = quizImporter;
+        this.AIGenService = AIGenService;
     }
 
     @PostMapping
@@ -66,4 +69,19 @@ public class QuizController {
         int elapsedTime = (int) body.get("elapsedTime");
         return quizService.evaluateQuiz(id, userAnswers, elapsedTime);
     }
+
+    @PostMapping(value = "/generate")
+    public Quiz generateQuiz(@RequestParam("name") String name, @RequestParam("info") String info, @RequestParam("questions") int noOfQuestions, @RequestParam String language, @RequestParam String apiKey) {
+        try {
+            AIGenService.setApiKey(apiKey);
+            String quizJson = AIGenService.generateQuiz(name, info, noOfQuestions, language);
+            Quiz quiz = quizImporter.createQuizFromJson(quizJson);
+            return quizService.saveQuiz(quiz);
+        } catch (IOException e) {
+            throw new RuntimeException("Error generating quiz", e);
+        } catch (IllegalStateException e) {
+            throw new RuntimeException("API key not set", e);
+        }
+    }
+
 }
