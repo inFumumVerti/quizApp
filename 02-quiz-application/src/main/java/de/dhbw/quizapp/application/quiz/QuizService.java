@@ -41,20 +41,29 @@ public class QuizService {
     public Map<String, Object> evaluateQuiz(UUID id, List<String> userAnswers, int timeTaken) {
         Quiz quiz = findQuizById(id);
 
-        int correctAnswers = 0;
         int totalQuestions = quiz.getQuestions().size();
         int totalTimeAllowed = totalQuestions * 5; // 5 seconds per question
 
-        List<Map<String, String>> questionResults = new ArrayList<>();
+        List<Map<String, String>> questionResults = getQuestionResults(quiz, userAnswers);
+        int correctAnswers = (int) questionResults.stream().filter(result -> Boolean.parseBoolean(result.get("isCorrect"))).count();
 
-        for (int i = 0; i < totalQuestions; i++) {
-            Question question = quiz.getQuestions().get(i);
+        Score score = calculateScore(correctAnswers, totalQuestions, timeTaken, totalTimeAllowed);
+
+        return buildResult(score, questionResults);
+    }
+
+    private Score calculateScore(int correctAnswers, int totalQuestions, int timeTaken, int totalTimeAllowed) {
+        return new Score(correctAnswers, totalQuestions, timeTaken, totalTimeAllowed);
+    }
+
+    private List<Map<String, String>> getQuestionResults(Quiz quiz, List<String> userAnswers) {
+        List<Map<String, String>> questionResults = new ArrayList<>();
+        List<Question> questions = quiz.getQuestions();
+
+        for (int i = 0; i < questions.size(); i++) {
+            Question question = questions.get(i);
             String userAnswer = userAnswers.get(i);
             boolean isCorrect = question.getCorrectAnswer().equals(userAnswer);
-
-            if (isCorrect) {
-                correctAnswers++;
-            }
 
             Map<String, String> questionResult = new HashMap<>();
             questionResult.put("questionId", question.getId().toString());
@@ -64,8 +73,10 @@ public class QuizService {
             questionResults.add(questionResult);
         }
 
-        Score score = new Score(correctAnswers, totalQuestions, timeTaken, totalTimeAllowed);
+        return questionResults;
+    }
 
+    private Map<String, Object> buildResult(Score score, List<Map<String, String>> questionResults) {
         Map<String, Object> result = new HashMap<>();
         result.put("score", score.getValue());
         result.put("questionResults", questionResults);
