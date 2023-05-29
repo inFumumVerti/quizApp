@@ -1,6 +1,6 @@
 .add-quiz {
   margin: 0;
-  min-width:50%;
+  width: 80%;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
   background-color: #fff;
   border-radius: 5px;
@@ -11,6 +11,7 @@ form {
   display:flex;
   justify-content: center;
   flex-direction:column;
+  align-items: stretch;
 }
 
 .form-group {
@@ -37,7 +38,7 @@ textarea {
 
 .form-actions {
   display:flex;
-  justify-content:flex-end;
+  justify-content:space-around;
 }
 
 button {
@@ -59,4 +60,19 @@ button:hover {
 button:disabled {
   background-color:#ccc;
   cursor:not-allowed;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.spinner {
+  border: 16px solid #f3f3f3;
+  border-top: 16px solid #3498db;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  align: center;
+  animation: spin 2s linear infinite;
 }

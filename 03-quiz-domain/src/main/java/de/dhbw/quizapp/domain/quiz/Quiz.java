@@ -6,12 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -33,12 +28,15 @@ public class Quiz {
     @Column(name = "description")
     private String description;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL)
     @NotEmpty
-    private List<Question> questions;
+    private List<Question> questions = new ArrayList<>();
 
-    protected Quiz() {
-        // default constructor for JPA
+    public Quiz() {}
+
+    public Quiz(final String title, final String description) {
+        this.title = title;
+        this.description = description;
     }
 
     public UUID getId() {

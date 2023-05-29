@@ -28,7 +28,7 @@
         <module>00-quiz-plugins</module>
     </modules>
 
-	<build>
+    <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -36,8 +36,8 @@
                 <version>3.11.0</version>
                 <configuration>
                     <debug>true</debug>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>19</source>
+                    <target>19</target>
                 </configuration>
             </plugin>
             <plugin>
@@ -49,5 +49,6 @@
             </plugin>
         </plugins>
     </build>
+
 
 </project>

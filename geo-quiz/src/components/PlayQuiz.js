@@ -1,4 +1,4 @@
-// PlayQuiz.js
+"// PlayQuiz.js"
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
@@ -8,6 +8,7 @@ const PlayQuiz = () => {
     const [quiz, setQuiz] = useState(null);
     const [userAnswers, setUserAnswers] = useState({ currentIndex: 0, answers: [] });
     const [showResults, setShowResults] = useState(false);
+    const [startTime, setStartTime] = useState(null);
     const { id } = useParams();
     const QUIZ_API_BASE_URL = 'http://localhost:8080/api/quiz';
 
@@ -20,6 +21,7 @@ const PlayQuiz = () => {
             } catch (error) {
                 console.error('Error fetching quiz:', error);
             }
+            setStartTime(new Date().getTime());
         })();
     }, [id]);
 
@@ -29,21 +31,41 @@ const PlayQuiz = () => {
         setUserAnswers({ ...userAnswers, answers: newUserAnswers });
     };
 
-    const handleSubmit = () => {
+    const handleNavigation = (direction) => {
+        const newCurrentIndex = direction === 'prev' ? userAnswers.currentIndex - 1 : userAnswers.currentIndex + 1;
+        setUserAnswers({ ...userAnswers, currentIndex: newCurrentIndex });
+    };
+
+    const handleSubmit = async () => {
         if (userAnswers.currentIndex === quiz.questions.length - 1) {
-            setShowResults(true);
+            const endTime = new Date().getTime();
+            const elapsedTime = Math.floor((endTime - startTime) / 1000);
+            try {
+                const response = await axios.post(
+                    `${QUIZ_API_BASE_URL}/${id}/submit`,
+                    {
+                        userAnswers: userAnswers.answers,
+                        elapsedTime: elapsedTime
+                    }
+                );
+                handleQuizResponse(response.data);
+            } catch (error) {
+                console.error('Error submitting quiz:', error);
+            }
         } else {
             setUserAnswers({ ...userAnswers, currentIndex: userAnswers.currentIndex + 1 });
         }
     };
 
-    const calculateScore = () => {
-        return userAnswers.answers.reduce(
-            (score, answer, index) => (quiz.questions[index].correctAnswer === answer ? score + 1 : score),
-            0
-        );
-    };
 
+        const handleQuizResponse = (quizResponse) => {
+            setShowResults(true);
+            setUserAnswers((prevState) => ({
+                ...prevState,
+                results: quizResponse.questionResults,
+                score: quizResponse.score,
+            }));
+        };
     if (!quiz) {
         return <div>Loading...</div>;
     }
@@ -53,9 +75,9 @@ const PlayQuiz = () => {
             <div className="quiz-results">
                 <h1>Results</h1>
                 <p>
-                    You scored {calculateScore()} out of {quiz.questions.length}
+                    <h2>Your score is {userAnswers.score} out of 100!</h2>
                 </p>
-                <Link to="/quizList">Back to quiz list</Link>
+
                 <div className="result-question-container">
                     {quiz.questions.map((question, questionIndex) => {
                         const isUserCorrect = question.correctAnswer === userAnswers.answers[questionIndex];
@@ -110,6 +132,7 @@ const PlayQuiz = () => {
             <div className="play-quiz">
                 <h2>{quiz.title}</h2>
                 <p>{quiz.description}</p>
+                <div className="question-counter">{`${userAnswers.currentIndex + 1} / ${quiz.questions.length}`}</div>
                 <div key={question.id} className="question">
                     <h3>{question.title}</h3>
                     <div className="answer-grid">
@@ -140,17 +163,31 @@ const PlayQuiz = () => {
                         ))}
                     </div>
                 </div>
-                <button
-                    onClick={handleSubmit}
-                    disabled={userAnswers.answers[userAnswers.currentIndex] === null}
-                >
-                    {userAnswers.currentIndex === quiz.questions.length - 1 ? 'Submit' : 'Next'}
-                </button>
+                <div className="button-container">
+                    <button
+                        onClick={() => handleNavigation('prev')}
+                        disabled={userAnswers.currentIndex === 0}
+                    >
+                        Previous
+                    </button>
+                    {userAnswers.currentIndex < quiz.questions.length - 1 ? (
+                        <button onClick={() => handleNavigation('next')}>
+                            Next
+                        </button>
+                    ) : (
+                        <button
+                            onClick={handleSubmit}
+                            disabled={userAnswers.answers.some(answer => answer === null)}
+                        >
+                            Submit
+                        </button>
+
+                    )}
+                </div>
+
             </div>
         );
     }
 };
 
 export default PlayQuiz;
-
-

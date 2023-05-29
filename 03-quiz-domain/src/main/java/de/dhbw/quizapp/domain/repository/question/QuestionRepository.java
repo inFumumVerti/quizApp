@@ -10,5 +10,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface QuestionRepository extends JpaRepository<Question, Long> {
-    // No need to declare the methods, JpaRepository provides them
 }
