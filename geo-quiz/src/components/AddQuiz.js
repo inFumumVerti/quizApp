@@ -27,6 +27,7 @@ const [quizInfo, setQuizInfo] = useState("");
 const [quizQuestions, setQuizQuestions] = useState(1);
 const [quizLanguage, setQuizLanguage] = useState("");
 const [quizAPIKey, setQuizAPIKey] = useState("");
+const [quizModel, setQuizModel] = useState("gpt-3.5-turbo");
 
   const addQuestion = () => {
     setQuiz({
@@ -88,18 +89,19 @@ const handleImportQuiz = async () => {
 
   const handleGenerateQuiz = async (e) => {
       e.preventDefault();
+      setLoading(true);
 
       try {
           const response = await axios.post("http://localhost:8080/api/quiz/generate", null, {
-              params: {
-                  name: quizName,
-                  info: quizInfo,
-                  questions: quizQuestions,
-                  language: quizLanguage,
-                  apiKey: quizAPIKey
-              }
-          });
-
+                        params: {
+                            name: quizName,
+                            info: quizInfo,
+                            questions: quizQuestions,
+                            language: quizLanguage,
+                            apiKey: quizAPIKey,
+                            model: quizModel,
+                        }
+                    });
           setLoading(false);
           setQuizAdded(true);
           setAddedQuizId(response.data.id);
@@ -108,6 +110,7 @@ const handleImportQuiz = async () => {
           setLoading(false);
       }
   };
+
 
   const handleGoToHomePage = () => {
     navigate('/');
@@ -252,64 +255,77 @@ const handleImportQuiz = async () => {
 
         <TabPanel>
             <h2>Create a New Quiz with AI</h2>
-            <form onSubmit={handleGenerateQuiz}>
-                <div>
-                    <label htmlFor="quizName">Quiz Name: </label>
-                    <input
-                        type="text"
-                        id="quizName"
-                        value={quizName}
-                        onChange={(e) => setQuizName(e.target.value)}
-                        required
-                    />
-                </div>
-                <div>
-                    <label htmlFor="quizInfo">Further Information: </label>
-                    <input
-                        type="text"
-                        id="quizInfo"
-                        value={quizInfo}
-                        onChange={(e) => setQuizInfo(e.target.value)}
-                        required
-                    />
-                </div>
-                <div>
-                  <label htmlFor="quizQuestions">Number of Questions: </label>
-                  <input
-                      type="number"
-                      id="quizQuestions"
-                      value={quizQuestions}
-                      onChange={(e) => setQuizQuestions(e.target.value)}
-                      min="1"
-                      max="10"
-                      required
-                  />
-                </div>
-                <div>
-                    <label htmlFor="quizLanguage">Language: </label>
-                    <input
-                        type="text"
-                        id="quizLanguage"
-                        value={quizLanguage}
-                        onChange={(e) => setQuizLanguage(e.target.value)}
-                        required
-                    />
-                </div>
-                <div>
-                    <label htmlFor="quizAPIKey">OpenAI API Key: </label>
-                    <input
-                        type="text"
-                        id="quizAPIKey"
-                        value={quizAPIKey}
-                        onChange={(e) => setQuizAPIKey(e.target.value)}
-                        required
-                    />
-                </div>
-                <button type="submit" disabled={loading}>
-                    {loading ? 'Generating...' : 'Generate Quiz'}
-                </button>
-            </form>
+            {loading ? (
+                <div className="spinner"></div>
+            ) : (
+                <form onSubmit={handleGenerateQuiz}>
+                    <div>
+                        <label htmlFor="quizName">Quiz Name: </label>
+                        <input
+                            type="text"
+                            id="quizName"
+                            value={quizName}
+                            onChange={(e) => setQuizName(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label htmlFor="quizInfo">Further Information: </label>
+                        <input
+                            type="text"
+                            id="quizInfo"
+                            value={quizInfo}
+                            onChange={(e) => setQuizInfo(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div>
+                      <label htmlFor="quizQuestions">Number of Questions: </label>
+                      <input
+                          type="number"
+                          id="quizQuestions"
+                          value={quizQuestions}
+                          onChange={(e) => setQuizQuestions(e.target.value)}
+                          min="1"
+                          max="8"
+                          required
+                      />
+                    </div>
+                    <div>
+                        <label htmlFor="quizLanguage">Language: </label>
+                        <input
+                            type="text"
+                            id="quizLanguage"
+                            value={quizLanguage}
+                            onChange={(e) => setQuizLanguage(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label htmlFor="quizAPIKey">OpenAI API Key: </label>
+                        <input
+                            type="text"
+                            id="quizAPIKey"
+                            value={quizAPIKey}
+                            onChange={(e) => setQuizAPIKey(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label htmlFor="quizModel">Model: </label>
+                        <select id="quizModel" value={quizModel} onChange={(e) => setQuizModel(e.target.value)} required>
+                            <option value="gpt-4">GPT-4</option>
+                            <option value="gpt-4-32k">GPT-4 32K</option>
+                            <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                        </select>
+                    </div>
+                    <button type="submit" disabled={loading}>
+                        {loading ? 'Generating...' : 'Generate Quiz'}
+                    </button>
+                </form>
+            )}
         </TabPanel>
+
          <TabPanel>
                 <div className="add-quiz">
                   <h2>Import Quiz</h2>

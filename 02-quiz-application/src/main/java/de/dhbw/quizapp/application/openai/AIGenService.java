@@ -18,25 +18,25 @@ public class AIGenService {
     public AIGenService() {
         this.openaiApiKey = System.getenv("OPENAI_TOKEN");
         if (this.openaiApiKey != null) {
-            Duration timeOutDuration = Duration.ofSeconds(60);
+            Duration timeOutDuration = Duration.ofSeconds(300);
             this.openAiService = new OpenAiService(openaiApiKey, timeOutDuration);
         }
     }
 
     public void setApiKey(String apiKey) {
         this.openaiApiKey = apiKey;
-        Duration timeOutDuration = Duration.ofSeconds(60);
+        Duration timeOutDuration = Duration.ofSeconds(300);
         this.openAiService = new OpenAiService(openaiApiKey, timeOutDuration);
     }
 
-    public String generateQuiz(String quizName, String furtherInfo, int noOfQuestions, String language) {
+    public String generateQuiz(String quizName, String furtherInfo, int noOfQuestions, String language, String model) {
         if (openAiService == null) {
             throw new IllegalStateException("API key not set");
         }
 
         String prompt = createPrompt(quizName, furtherInfo, noOfQuestions, language);
         List<ChatMessage> messages = createChatMessages(prompt);
-        ChatCompletionRequest chatCompletionRequest = createChatCompletionRequest(messages);
+        ChatCompletionRequest chatCompletionRequest = createChatCompletionRequest(messages, model);
 
         return openAiService.createChatCompletion(chatCompletionRequest).getChoices().get(0).getMessage().getContent();
     }
@@ -63,7 +63,8 @@ Use this exact format:
                 "<answerOption1.A>, <answerOption1.B>, <answerOption1.C>, <answerOption1.D>"
             ]
         },
-        // more questions...
+        {
+            "title:...
     ]
 }
 
@@ -79,7 +80,8 @@ Quiz in JSON-Format:
             "correctAnswer": "C",
             "answerOptions": ["Paris", "London", "Berlin", "Rome"]
         },
-        // more questions...
+        {
+            "title:...
     ]
 }
 """;
@@ -94,10 +96,10 @@ Quiz in JSON-Format:
         return messages;
     }
 
-    private ChatCompletionRequest createChatCompletionRequest(List<ChatMessage> messages) {
+    private ChatCompletionRequest createChatCompletionRequest(List<ChatMessage> messages, String model) {
         return ChatCompletionRequest
                 .builder()
-                .model("gpt-3.5-turbo")
+                .model(model)
                 .messages(messages)
                 .n(1)
                 .maxTokens(500)

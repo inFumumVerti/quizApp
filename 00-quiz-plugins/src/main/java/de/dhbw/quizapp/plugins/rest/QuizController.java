@@ -71,10 +71,11 @@ public class QuizController {
     }
 
     @PostMapping(value = "/generate")
-    public Quiz generateQuiz(@RequestParam("name") String name, @RequestParam("info") String info, @RequestParam("questions") int noOfQuestions, @RequestParam String language, @RequestParam String apiKey) {
+    public Quiz generateQuiz(@RequestParam("name") String name, @RequestParam("info") String info, @RequestParam("questions") int noOfQuestions,
+                             @RequestParam("language") String language, @RequestParam("apiKey") String apiKey, @RequestParam("model") String model) {
         try {
             AIGenService.setApiKey(apiKey);
-            String quizJson = AIGenService.generateQuiz(name, info, noOfQuestions, language);
+            String quizJson = AIGenService.generateQuiz(name, info, noOfQuestions, language, model);
             Quiz quiz = quizImporter.createQuizFromJson(quizJson);
             return quizService.saveQuiz(quiz);
         } catch (IOException e) {
