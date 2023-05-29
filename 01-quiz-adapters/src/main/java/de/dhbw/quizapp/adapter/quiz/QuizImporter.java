@@ -55,7 +55,6 @@ public class QuizImporter {
         List<String> answerOptions = objectMapper.convertValue(questionNode.get(ANSWER_OPTIONS), new TypeReference<>() {
         });
 
-        // Check if correctAnswer is valid (A,B,C or D)
         if (!AnswerOption.isValid(correctAnswer)) {
             throw new IllegalArgumentException("Correct answer must be either A, B, C, or D.");
         }

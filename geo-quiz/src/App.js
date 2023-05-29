@@ -41,8 +41,8 @@ function App() {
 const Home = () => {
     return (
         <div>
-            <h1>Welcome to the Quiz App</h1>
-            <p>Test your knowledge with our quizzes!</p>
+            <h1>Welcome to geoo!</h1>
+            <p>Test your knowledge or create quizzes quickly, using our quiz creator tool or Artificial Intelligence!</p>
         </div>
     );
 };
