@@ -31,3 +31,48 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Compiled class file
+*.class
+
+# Log file
+*.log
+
+# BlueJ files
+*.ctxt
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files #
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Virtual Machine files
+*.vm
+
+# kubernetes files
+**/nohup.out
+
+# Maven - Ignore all target/ directories
+/target/
+
+# db files
+*.db
+
+# idea config files
+.idea/
+*.iml
+*.iws
+
+# Mac files
+.DS_Store
+
+# Spring Boot
+spring-boot:run
+
