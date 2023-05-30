@@ -57,15 +57,16 @@ const PlayQuiz = () => {
         }
     };
 
+    const handleQuizResponse = (quizResponse) => {
+        setShowResults(true);
+        setUserAnswers((prevState) => ({
+            ...prevState,
+            results: quizResponse.questionResults,
+            score: quizResponse.score,
+        }));
+    };
 
-        const handleQuizResponse = (quizResponse) => {
-            setShowResults(true);
-            setUserAnswers((prevState) => ({
-                ...prevState,
-                results: quizResponse.questionResults,
-                score: quizResponse.score,
-            }));
-        };
+
     if (!quiz) {
         return <div>Loading...</div>;
     }
